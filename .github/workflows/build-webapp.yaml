@@ -1,0 +1,91 @@
+name: Build webapp
+
+on:
+  push:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: 3.35.1
+    - run: |
+        eval `ssh-agent -s`
+        ssh-add - <<< '${{ secrets.SSH_KEY }}'
+        flutter pub get
+        flutter build web --dart-define=ENV_FILE=prod.env
+        
+    - name: Archive web build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build
+        path: build/web/
+
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    needs: ['build-web']
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Download web build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: build/web
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  dokploy_deploy:
+    runs-on: ubuntu-latest
+    needs: ['build-and-push-image']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Dokploy Deploy
+        uses: ./.github/actions/dokploy-deploy
+        with:
+          dokploy_host: ${{ secrets.DOKPLOY_HOST }}
+          dokploy_token: ${{ secrets.DOKPLOY_TOKEN }}
+          application_id: ${{ secrets.DOKPLOY_APPLICATION_ID }}
