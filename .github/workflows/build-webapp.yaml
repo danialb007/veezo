@@ -26,8 +26,6 @@ jobs:
         channel: stable
         flutter-version: 3.35.1
     - run: |
-        eval `ssh-agent -s`
-        ssh-add - <<< '${{ secrets.SSH_KEY }}'
         flutter pub get
         flutter build web --dart-define=ENV_FILE=prod.env
         
