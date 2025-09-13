@@ -15,7 +15,7 @@ import 'package:veezo/routes.dart';
 final _emailKey = const TextFieldKey(#email);
 final _passwordKey = const TextFieldKey(#password);
 
-class LoginPage extends HookConsumerWidget {
+class LoginPage extends ConsumerWidget {
   LoginPage({super.key});
 
   @override
@@ -26,35 +26,6 @@ class LoginPage extends HookConsumerWidget {
         context.go(routePaths.chat.path);
       }
     });
-
-    useEffect(() {
-      final googleSignIn = GoogleSignIn.instance;
-      unawaited(
-        googleSignIn
-            .initialize(
-              clientId:
-                  "161508267443-0qb8j6n0ooor3h1mt9mtpsjapra3tpri.apps.googleusercontent.com",
-            )
-            .then((value) {
-              googleSignIn.authenticationEvents
-                  .listen((GoogleSignInAuthenticationEvent e) {
-                    switch (e) {
-                      case GoogleSignInAuthenticationEventSignIn():
-                        signInWithGoogle(
-                          ref,
-                          idToken: e.user.authentication.idToken,
-                        );
-                        break;
-                      default:
-                    }
-                  })
-                  .onError((e) {
-                    e;
-                  });
-            }),
-      );
-      return null;
-    }, []);
 
     return Scaffold(
       child: Padding(
@@ -67,7 +38,7 @@ class LoginPage extends HookConsumerWidget {
               child: SizedBox(
                 height: 160,
                 width: 160,
-                child: Placeholder(fallbackHeight: 160, fallbackWidth: 160),
+                child: Image.asset('assets/images/logo.png'),
               ),
             ),
             Card(
@@ -123,22 +94,7 @@ class LoginPage extends HookConsumerWidget {
                         );
                       },
                     ),
-                    if (!kIsWeb)
-                      Button.secondary(
-                        onPressed: () {
-                          signInWithGoogle(ref);
-                        },
-                        child: Text("Login with Google"),
-                      )
-                    else
-                      web.renderButton(
-                        configuration: web.GSIButtonConfiguration(
-                          size: web.GSIButtonSize.large,
-                          theme: web.GSIButtonTheme.outline,
-                          minimumWidth: MediaQuery.sizeOf(context).width,
-                          logoAlignment: web.GSIButtonLogoAlignment.center,
-                        ),
-                      ),
+                    // _GoogleSigninButton(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -161,6 +117,59 @@ class LoginPage extends HookConsumerWidget {
             Text("Veezo AI", textAlign: TextAlign.center).h4,
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _GoogleSigninButton extends HookConsumerWidget {
+  const _GoogleSigninButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      final googleSignIn = GoogleSignIn.instance;
+      unawaited(
+        googleSignIn
+            .initialize(
+              clientId:
+                  "161508267443-0qb8j6n0ooor3h1mt9mtpsjapra3tpri.apps.googleusercontent.com",
+            )
+            .then((value) {
+              googleSignIn.authenticationEvents
+                  .listen((GoogleSignInAuthenticationEvent e) {
+                    switch (e) {
+                      case GoogleSignInAuthenticationEventSignIn():
+                        signInWithGoogle(
+                          ref,
+                          idToken: e.user.authentication.idToken,
+                        );
+                        break;
+                      default:
+                    }
+                  })
+                  .onError((e) {
+                    e;
+                  });
+            }),
+      );
+      return null;
+    }, []);
+
+    if (!kIsWeb) {
+      return Button.secondary(
+        onPressed: () {
+          signInWithGoogle(ref);
+        },
+        child: Text("Login with Google"),
+      );
+    }
+    return web.renderButton(
+      configuration: web.GSIButtonConfiguration(
+        size: web.GSIButtonSize.large,
+        theme: web.GSIButtonTheme.outline,
+        minimumWidth: MediaQuery.sizeOf(context).width,
+        logoAlignment: web.GSIButtonLogoAlignment.center,
       ),
     );
   }

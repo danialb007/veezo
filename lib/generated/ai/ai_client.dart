@@ -5,6 +5,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/message.dart';
 import '../models/web_socket_request_request.dart';
 import '../models/web_socket_response.dart';
 
@@ -18,5 +19,10 @@ abstract class AiClient {
   @POST('/api/v1/ai/generative_message/')
   Future<WebSocketResponse> aiGenerativeMessageCreate({
     @Body() required WebSocketRequestRequest body,
+  });
+
+  @GET('/api/v1/ai/message/')
+  Future<List<Message>> aiMessageList({
+    @Path('chat_id') required String chatId,
   });
 }

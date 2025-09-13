@@ -4,17 +4,25 @@
 
 import 'package:dart_mappable/dart_mappable.dart';
 
+import 'role_enum.dart';
+
 part 'message.mapper.dart';
 
 @MappableClass()
 class Message with MessageMappable {
 
   const Message({
-    this.id,
-    this.text,
+    required this.id,
+    required this.created,
+    required this.modified,
+    required this.role,
+    required this.text,
   });
-  final String? id;
-  final String? text;
+  final String id;
+  final DateTime created;
+  final DateTime modified;
+  final RoleEnum role;
+  final String text;
 
 
   static Message fromJson(Map<String, dynamic> json) => MessageMapper.ensureInitialized().decodeMap<Message>(json);

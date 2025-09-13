@@ -24,19 +24,30 @@ class WebSocketRequestRequestMapper
   @override
   final String id = 'WebSocketRequestRequest';
 
-  static String _$prompt(WebSocketRequestRequest v) => v.prompt;
-  static const Field<WebSocketRequestRequest, String> _f$prompt = Field(
-    'prompt',
-    _$prompt,
+  static String _$message(WebSocketRequestRequest v) => v.message;
+  static const Field<WebSocketRequestRequest, String> _f$message = Field(
+    'message',
+    _$message,
+  );
+  static String? _$chatId(WebSocketRequestRequest v) => v.chatId;
+  static const Field<WebSocketRequestRequest, String> _f$chatId = Field(
+    'chatId',
+    _$chatId,
+    key: r'chat_id',
+    opt: true,
   );
 
   @override
   final MappableFields<WebSocketRequestRequest> fields = const {
-    #prompt: _f$prompt,
+    #message: _f$message,
+    #chatId: _f$chatId,
   };
 
   static WebSocketRequestRequest _instantiate(DecodingData data) {
-    return WebSocketRequestRequest(prompt: data.dec(_f$prompt));
+    return WebSocketRequestRequest(
+      message: data.dec(_f$message),
+      chatId: data.dec(_f$chatId),
+    );
   }
 
   @override
@@ -109,7 +120,7 @@ abstract class WebSocketRequestRequestCopyWith<
   $Out
 >
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? prompt});
+  $R call({String? message, String? chatId});
   WebSocketRequestRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -125,11 +136,17 @@ class _WebSocketRequestRequestCopyWithImpl<$R, $Out>
   late final ClassMapperBase<WebSocketRequestRequest> $mapper =
       WebSocketRequestRequestMapper.ensureInitialized();
   @override
-  $R call({String? prompt}) =>
-      $apply(FieldCopyWithData({if (prompt != null) #prompt: prompt}));
+  $R call({String? message, Object? chatId = $none}) => $apply(
+    FieldCopyWithData({
+      if (message != null) #message: message,
+      if (chatId != $none) #chatId: chatId,
+    }),
+  );
   @override
-  WebSocketRequestRequest $make(CopyWithData data) =>
-      WebSocketRequestRequest(prompt: data.get(#prompt, or: $value.prompt));
+  WebSocketRequestRequest $make(CopyWithData data) => WebSocketRequestRequest(
+    message: data.get(#message, or: $value.message),
+    chatId: data.get(#chatId, or: $value.chatId),
+  );
 
   @override
   WebSocketRequestRequestCopyWith<$R2, WebSocketRequestRequest, $Out2>

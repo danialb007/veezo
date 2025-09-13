@@ -9,10 +9,12 @@ export 'blog/blog_client.dart';
 // Data classes
 export 'models/blog_post.dart';
 export 'models/blog_post_detail.dart';
+export 'models/chat.dart';
 export 'models/login.dart';
 export 'models/login_request.dart';
 export 'models/message.dart';
 export 'models/patched_user_request.dart';
+export 'models/role_enum.dart';
 export 'models/signup_request.dart';
 export 'models/social_login.dart';
 export 'models/social_login_request.dart';

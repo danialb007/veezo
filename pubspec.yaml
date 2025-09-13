@@ -33,6 +33,9 @@ dependencies:
   google_sign_in: ^7.1.1
   shared_preferences: ^2.5.3
 
+  flutter_native_splash: ^2.4.6
+  icons_launcher: ^3.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -55,6 +58,7 @@ flutter:
     - .env
     - staging.env
     - prod.env
+    - assets/images/logo.png
   
   # example:
   # fonts:
@@ -77,3 +81,24 @@ swagger_parser:
   output_directory: lib/generated/
   json_serializer: dart_mappable
   use_multipart_file: true
+
+icons_launcher:
+  image_path: "assets/images/logo.png"
+  platforms:
+    android:
+      adaptive_round_image: "assets/images/ic_launcher_round.png"
+      adaptive_monochrome_image: "assets/images/ic_launcher_foreground.png"
+      adaptive_foreground_image: "assets/images/ic_launcher_foreground.png"
+      adaptive_background_image: "assets/images/ic_launcher_background.png"
+      notification_image: "assets/images/ic_launcher_notification.png"
+      enable: true
+    ios:
+      enable: true
+    web:
+      enable: true
+
+flutter_native_splash:
+  color: "#000000"
+  image: assets/images/ic_launcher_foreground.png
+  android_12:
+    image: assets/images/ic_launcher_foreground.png

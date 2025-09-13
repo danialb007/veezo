@@ -14,6 +14,7 @@ class MessageMapper extends ClassMapperBase<Message> {
   static MessageMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MessageMapper._());
+      RoleEnumMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -21,20 +22,40 @@ class MessageMapper extends ClassMapperBase<Message> {
   @override
   final String id = 'Message';
 
-  static String? _$id(Message v) => v.id;
-  static const Field<Message, String> _f$id = Field('id', _$id, opt: true);
-  static String? _$text(Message v) => v.text;
-  static const Field<Message, String> _f$text = Field(
-    'text',
-    _$text,
-    opt: true,
+  static String _$id(Message v) => v.id;
+  static const Field<Message, String> _f$id = Field('id', _$id);
+  static DateTime _$created(Message v) => v.created;
+  static const Field<Message, DateTime> _f$created = Field(
+    'created',
+    _$created,
   );
+  static DateTime _$modified(Message v) => v.modified;
+  static const Field<Message, DateTime> _f$modified = Field(
+    'modified',
+    _$modified,
+  );
+  static RoleEnum _$role(Message v) => v.role;
+  static const Field<Message, RoleEnum> _f$role = Field('role', _$role);
+  static String _$text(Message v) => v.text;
+  static const Field<Message, String> _f$text = Field('text', _$text);
 
   @override
-  final MappableFields<Message> fields = const {#id: _f$id, #text: _f$text};
+  final MappableFields<Message> fields = const {
+    #id: _f$id,
+    #created: _f$created,
+    #modified: _f$modified,
+    #role: _f$role,
+    #text: _f$text,
+  };
 
   static Message _instantiate(DecodingData data) {
-    return Message(id: data.dec(_f$id), text: data.dec(_f$text));
+    return Message(
+      id: data.dec(_f$id),
+      created: data.dec(_f$created),
+      modified: data.dec(_f$modified),
+      role: data.dec(_f$role),
+      text: data.dec(_f$text),
+    );
   }
 
   @override
@@ -94,7 +115,13 @@ extension MessageValueCopy<$R, $Out> on ObjectCopyWith<$R, Message, $Out> {
 
 abstract class MessageCopyWith<$R, $In extends Message, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? id, String? text});
+  $R call({
+    String? id,
+    DateTime? created,
+    DateTime? modified,
+    RoleEnum? role,
+    String? text,
+  });
   MessageCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -107,15 +134,27 @@ class _MessageCopyWithImpl<$R, $Out>
   late final ClassMapperBase<Message> $mapper =
       MessageMapper.ensureInitialized();
   @override
-  $R call({Object? id = $none, Object? text = $none}) => $apply(
+  $R call({
+    String? id,
+    DateTime? created,
+    DateTime? modified,
+    RoleEnum? role,
+    String? text,
+  }) => $apply(
     FieldCopyWithData({
-      if (id != $none) #id: id,
-      if (text != $none) #text: text,
+      if (id != null) #id: id,
+      if (created != null) #created: created,
+      if (modified != null) #modified: modified,
+      if (role != null) #role: role,
+      if (text != null) #text: text,
     }),
   );
   @override
   Message $make(CopyWithData data) => Message(
     id: data.get(#id, or: $value.id),
+    created: data.get(#created, or: $value.created),
+    modified: data.get(#modified, or: $value.modified),
+    role: data.get(#role, or: $value.role),
     text: data.get(#text, or: $value.text),
   );
 

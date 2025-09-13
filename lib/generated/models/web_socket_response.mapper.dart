@@ -16,6 +16,7 @@ class WebSocketResponseMapper extends ClassMapperBase<WebSocketResponse> {
       MapperContainer.globals.use(_instance = WebSocketResponseMapper._());
       StatusEnumMapper.ensureInitialized();
       MessageMapper.ensureInitialized();
+      ChatMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -34,6 +35,12 @@ class WebSocketResponseMapper extends ClassMapperBase<WebSocketResponse> {
     _$message,
     opt: true,
   );
+  static Chat? _$chat(WebSocketResponse v) => v.chat;
+  static const Field<WebSocketResponse, Chat> _f$chat = Field(
+    'chat',
+    _$chat,
+    opt: true,
+  );
   static String? _$error(WebSocketResponse v) => v.error;
   static const Field<WebSocketResponse, String> _f$error = Field(
     'error',
@@ -45,6 +52,7 @@ class WebSocketResponseMapper extends ClassMapperBase<WebSocketResponse> {
   final MappableFields<WebSocketResponse> fields = const {
     #status: _f$status,
     #message: _f$message,
+    #chat: _f$chat,
     #error: _f$error,
   };
 
@@ -52,6 +60,7 @@ class WebSocketResponseMapper extends ClassMapperBase<WebSocketResponse> {
     return WebSocketResponse(
       status: data.dec(_f$status),
       message: data.dec(_f$message),
+      chat: data.dec(_f$chat),
       error: data.dec(_f$error),
     );
   }
@@ -128,7 +137,8 @@ abstract class WebSocketResponseCopyWith<
 >
     implements ClassCopyWith<$R, $In, $Out> {
   MessageCopyWith<$R, Message, Message>? get message;
-  $R call({StatusEnum? status, Message? message, String? error});
+  ChatCopyWith<$R, Chat, Chat>? get chat;
+  $R call({StatusEnum? status, Message? message, Chat? chat, String? error});
   WebSocketResponseCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -146,14 +156,19 @@ class _WebSocketResponseCopyWithImpl<$R, $Out>
   MessageCopyWith<$R, Message, Message>? get message =>
       $value.message?.copyWith.$chain((v) => call(message: v));
   @override
+  ChatCopyWith<$R, Chat, Chat>? get chat =>
+      $value.chat?.copyWith.$chain((v) => call(chat: v));
+  @override
   $R call({
     StatusEnum? status,
     Object? message = $none,
+    Object? chat = $none,
     Object? error = $none,
   }) => $apply(
     FieldCopyWithData({
       if (status != null) #status: status,
       if (message != $none) #message: message,
+      if (chat != $none) #chat: chat,
       if (error != $none) #error: error,
     }),
   );
@@ -161,6 +176,7 @@ class _WebSocketResponseCopyWithImpl<$R, $Out>
   WebSocketResponse $make(CopyWithData data) => WebSocketResponse(
     status: data.get(#status, or: $value.status),
     message: data.get(#message, or: $value.message),
+    chat: data.get(#chat, or: $value.chat),
     error: data.get(#error, or: $value.error),
   );
 

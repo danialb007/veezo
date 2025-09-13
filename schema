@@ -43,6 +43,45 @@
                 }
             }
         },
+        "/api/v1/ai/message/": {
+            "get": {
+                "operationId": "ai_message_list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "chat_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ai"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Message"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/v1/auth/google_login/": {
             "post": {
                 "operationId": "auth_google_login_create",
@@ -448,6 +487,38 @@
                     "title"
                 ]
             },
+            "Chat": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "created": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "modified": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "created",
+                    "id",
+                    "modified"
+                ]
+            },
             "Login": {
                 "type": "object",
                 "properties": {
@@ -498,18 +569,34 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "created": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "modified": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "role": {
+                        "$ref": "#/components/schemas/RoleEnum"
                     },
                     "text": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
+                        "type": "string"
                     }
-                }
+                },
+                "required": [
+                    "created",
+                    "id",
+                    "modified",
+                    "role",
+                    "text"
+                ]
             },
             "PatchedUserRequest": {
                 "type": "object",
@@ -534,6 +621,15 @@
                         "maxLength": 150
                     }
                 }
+            },
+            "RoleEnum": {
+                "enum": [
+                    "user",
+                    "assistant",
+                    "system"
+                ],
+                "type": "string",
+                "description": "* `user` - User\n* `assistant` - Assistant\n* `system` - System"
             },
             "SignupRequest": {
                 "type": "object",
@@ -753,13 +849,20 @@
             "WebSocketRequestRequest": {
                 "type": "object",
                 "properties": {
-                    "prompt": {
+                    "message": {
                         "type": "string",
+                        "minLength": 1
+                    },
+                    "chat_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "minLength": 1
                     }
                 },
                 "required": [
-                    "prompt"
+                    "message"
                 ]
             },
             "WebSocketResponse": {
@@ -770,6 +873,9 @@
                     },
                     "message": {
                         "$ref": "#/components/schemas/Message"
+                    },
+                    "chat": {
+                        "$ref": "#/components/schemas/Chat"
                     },
                     "error": {
                         "type": [

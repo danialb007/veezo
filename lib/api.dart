@@ -19,6 +19,9 @@ class Api extends RestClient {
         ..interceptors.add(interceptor(ref));
 
   static String baseUrl = dotenv.get("BASE_URL");
+  static String baseWebsocketUrl = baseUrl
+      .replaceAll('https', 'wss')
+      .replaceAll('http', 'ws');
 
   String _token = '';
 

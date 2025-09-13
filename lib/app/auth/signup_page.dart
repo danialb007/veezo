@@ -50,7 +50,7 @@ class SignupPage extends HookConsumerWidget {
               child: SizedBox(
                 height: 160,
                 width: 160,
-                child: Placeholder(fallbackHeight: 160, fallbackWidth: 160),
+                child: Image.asset('assets/images/logo.png'),
               ),
             ),
             Card(

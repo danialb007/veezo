@@ -4,6 +4,7 @@
 
 import 'package:dart_mappable/dart_mappable.dart';
 
+import 'chat.dart';
 import 'message.dart';
 import 'status_enum.dart';
 
@@ -15,10 +16,12 @@ class WebSocketResponse with WebSocketResponseMappable {
   const WebSocketResponse({
     required this.status,
     this.message,
+    this.chat,
     this.error,
   });
   final StatusEnum status;
   final Message? message;
+  final Chat? chat;
   final String? error;
 
 

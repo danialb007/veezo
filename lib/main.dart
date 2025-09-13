@@ -34,6 +34,7 @@ class VeezoApp extends StatelessWidget {
         ),
         radius: 0.8,
       ),
+      scaling: AdaptiveScaling(1),
       routerConfig: router,
     );
   }

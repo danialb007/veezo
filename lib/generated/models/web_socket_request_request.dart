@@ -10,9 +10,12 @@ part 'web_socket_request_request.mapper.dart';
 class WebSocketRequestRequest with WebSocketRequestRequestMappable {
 
   const WebSocketRequestRequest({
-    required this.prompt,
+    required this.message,
+    this.chatId,
   });
-  final String prompt;
+  final String message;
+  @MappableField(key: 'chat_id')
+  final String? chatId;
 
 
   static WebSocketRequestRequest fromJson(Map<String, dynamic> json) => WebSocketRequestRequestMapper.ensureInitialized().decodeMap<WebSocketRequestRequest>(json);
