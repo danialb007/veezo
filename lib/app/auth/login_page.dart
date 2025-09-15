@@ -10,6 +10,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:veezo/api.dart';
 import 'package:veezo/domain/auth/auth_notifier.dart';
 import 'package:veezo/generated/export.dart';
+import 'package:veezo/i18n/strings.g.dart';
 import 'package:veezo/routes.dart';
 
 final _emailKey = const TextFieldKey(#email);
@@ -60,21 +61,21 @@ class LoginPage extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text("Login to your account").h3,
+                        Text(t.auth.login.loginToYourAccount).h3,
                         Text(
-                          "Enter your email below to login to your account",
+                          t.auth.login.enterYourEmailBelowToLoginToYourAccount,
                         ).firstP,
                       ],
                     ),
                     FormField(
                       key: _emailKey,
-                      label: Text("Email"),
-                      validator: EmailValidator(),
+                      label: Text(t.email),
+                      validator: EmailValidator(message: t.auth.invalidEmail),
                       child: TextField(placeholder: Text('m@mail.com')),
                     ),
                     FormField(
                       key: _passwordKey,
-                      label: Text("Password"),
+                      label: Text(t.password),
                       validator: NotEmptyValidator(),
                       showErrors: {FormValidationMode.changed},
                       child: TextField(obscureText: true),
@@ -90,7 +91,7 @@ class LoginPage extends ConsumerWidget {
                                   ),
                                 )
                               : null,
-                          child: Text("Login"),
+                          child: Text(t.auth.login.login),
                         );
                       },
                     ),
@@ -98,14 +99,14 @@ class LoginPage extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Don't have account?").muted,
+                        Text(t.auth.login.dontHaveAccount).muted,
                         Gap(4),
                         Button.link(
                           onPressed: () => context.go(routePaths.auth.signup),
                           style: ButtonStyle.link(
                             density: ButtonDensity.compact,
                           ),
-                          child: Text("Sign up"),
+                          child: Text(t.auth.login.signUp),
                         ),
                       ],
                     ),

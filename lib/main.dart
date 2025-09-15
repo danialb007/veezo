@@ -1,19 +1,23 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:veezo/domain/di.dart';
+import 'package:veezo/i18n/strings.g.dart';
 import 'package:veezo/routes.dart';
 import 'package:veezo/utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  LocaleSettings.setLocale(AppLocale.fa);
+
   await dotenv.load(fileName: envFile);
 
   configureDependencies();
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
-  runApp(ProviderScope(child: const VeezoApp()));
+  runApp(TranslationProvider(child: ProviderScope(child: const VeezoApp())));
 }
 
 class VeezoApp extends StatelessWidget {
@@ -22,7 +26,7 @@ class VeezoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadcnApp.router(
-      title: 'Flutter Demo',
+      title: 'Veezo AI',
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
@@ -35,6 +39,11 @@ class VeezoApp extends StatelessWidget {
         radius: 0.8,
       ),
       scaling: AdaptiveScaling(1),
+
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+
       routerConfig: router,
     );
   }

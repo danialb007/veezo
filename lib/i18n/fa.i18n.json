@@ -1,0 +1,30 @@
+{
+	"veezoAI": "Veezo AI",
+	"email": "ایمیل",
+	"password": "پسوورد",
+	"auth": {
+		"invalidEmail": "ایمیل نامعتبر",
+		"login": {
+			"login": "ورود",
+			"loginToYourAccount": "ورود به اکانت",
+			"enterYourEmailBelowToLoginToYourAccount": "برای ورود ایمیل خود را وارد کنید",
+			"dontHaveAccount": "اکانت ندارید؟",
+			"signUp": "ثبت نام"
+		},
+		"signUp": {
+			"createAnAccount": "اکانت بسازید",
+			"enterYourEmailBelowToCreateYourAccount": "برای ایجاد اکانت ایمیل خود را وارد کنید",
+			"confirmPassword": "تأیید پسوورد",
+			"passwordsDontMatch": "رمز‌های وارد شده یکسان نیستند",
+			"createAccount": "ایجاد اکانت",
+			"alreadyHaveAnAccount": "اکانت دارید؟"
+		}
+	},
+	"chat": {
+		"credit": "اعتبار",
+		"newChat": "چت جدید",
+		"messageIsCopied": "Message is copied",
+		"writeAScenarioAbout": "یه سناریو بنویس راجب ...",
+		"contentCalendar": "تقویم محتوایی"
+	}
+}

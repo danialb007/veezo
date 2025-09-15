@@ -12,6 +12,7 @@ import 'package:veezo/api.dart';
 import 'package:veezo/domain/auth/auth_notifier.dart';
 import 'package:veezo/domain/chat/chat_messages_notifier.dart';
 import 'package:veezo/generated/export.dart';
+import 'package:veezo/i18n/strings.g.dart';
 import 'package:veezo/presentation/widgets/loading.dart';
 import 'package:veezo/routes.dart';
 import 'package:veezo/utils/constants.dart';
@@ -74,6 +75,9 @@ class ChatPage extends HookConsumerWidget {
 
         if (response.value?.status == StatusEnum.finished) {
           messagesNotifier.append(response.value!.message!);
+          response.value = response.value?.copyWith(
+            message: response.value?.message?.copyWith(text: ''),
+          );
         }
 
         if (!scrollController.position.isScrollingNotifier.value) {
@@ -95,7 +99,7 @@ class ChatPage extends HookConsumerWidget {
               builder: (context) {
                 useListenable(chat);
                 return AppBar(
-                  title: Text(chat.value?.title ?? 'New chat'),
+                  title: Text(chat.value?.title ?? t.chat.newChat),
                   leading: [
                     IconButton.ghost(
                       onPressed: () {},
@@ -103,7 +107,7 @@ class ChatPage extends HookConsumerWidget {
                     ),
                   ],
                   trailing: [
-                    Button.text(onPressed: () {}, child: Text("اعتبار")),
+                    Button.text(onPressed: () {}, child: Text(t.chat.credit)),
                   ],
                 );
               },
@@ -150,8 +154,8 @@ class ChatPage extends HookConsumerWidget {
                                             builder: (context, overlay) {
                                               return SurfaceCard(
                                                 child: Basic(
-                                                  title: const Text(
-                                                    'Message is copied',
+                                                  title: Text(
+                                                    t.chat.messageIsCopied,
                                                   ),
                                                 ),
                                               );
@@ -167,8 +171,8 @@ class ChatPage extends HookConsumerWidget {
 
                               return GptMarkdown(
                                 key: ValueKey(value),
-                                message.text,
                                 textDirection: TextDirection.rtl,
+                                message.text,
                               );
                             },
                           ),
@@ -200,8 +204,8 @@ class ChatPage extends HookConsumerWidget {
                                     ),
                                 child: GptMarkdown(
                                   key: ValueKey(value),
-                                  value.message?.text ?? '',
                                   textDirection: TextDirection.rtl,
+                                  value.message?.text ?? '',
                                 ),
                               ),
                             ),
@@ -272,11 +276,7 @@ class ChatPage extends HookConsumerWidget {
                       padding: EdgeInsets.all(2),
                       minLines: 1,
                       maxLines: null,
-                      textDirection: TextDirection.rtl,
-                      placeholder: Text(
-                        "سناریو راجب چی میخوای؟",
-                        textDirection: TextDirection.rtl,
-                      ),
+                      placeholder: Text(t.chat.writeAScenarioAbout),
                     ),
                   ),
                   Gap(8),
@@ -290,7 +290,7 @@ class ChatPage extends HookConsumerWidget {
                           children: [
                             Icon(BootstrapIcons.calendar3, size: 16),
                             Gap(8),
-                            Text("تقویم محتوایی"),
+                            Text(t.chat.contentCalendar),
                           ],
                         ),
                       ),

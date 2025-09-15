@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:veezo/domain/auth/auth_notifier.dart';
 import 'package:veezo/generated/export.dart';
+import 'package:veezo/i18n/strings.g.dart';
 import 'package:veezo/routes.dart';
 
 final _emailKey = const TextFieldKey(#email);
@@ -77,17 +78,17 @@ class SignupPage extends HookConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text("Create an account").h3,
+                        Text(t.auth.signUp.createAnAccount).h3,
                         Text(
-                          "Enter your email below to login to your account",
+                          t.auth.signUp.enterYourEmailBelowToCreateYourAccount,
                         ).firstP,
                       ],
                     ),
                     FormField(
                       key: _emailKey,
-                      label: Text("Email"),
+                      label: Text(t.email),
                       validator:
-                          EmailValidator() &
+                          EmailValidator(message: t.auth.invalidEmail) &
                           ValidationMode(
                             ConditionalValidator((value) async {
                               final email = value;
@@ -112,17 +113,17 @@ class SignupPage extends HookConsumerWidget {
                     ),
                     FormField(
                       key: _passwordKey,
-                      label: Text("Password"),
+                      label: Text(t.password),
                       // validator: SafePasswordValidator(),
                       child: TextField(obscureText: true),
                     ),
                     FormField(
                       key: _passwordConfirmKey,
-                      label: Text("Confirm Password"),
-                      showErrors: {FormValidationMode.submitted},
+                      label: Text(t.auth.signUp.confirmPassword),
+                      showErrors: {FormValidationMode.changed},
                       validator: CompareWith.equal(
                         _passwordKey,
-                        message: 'رمز‌های وارد شده یکسان نیستند',
+                        message: t.auth.signUp.passwordsDontMatch,
                       ),
                       child: TextField(obscureText: true),
                     ),
@@ -137,21 +138,21 @@ class SignupPage extends HookConsumerWidget {
                                   ),
                                 )
                               : null,
-                          child: Text("Create account"),
+                          child: Text(t.auth.signUp.createAccount),
                         );
                       },
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Already have an account?").muted,
+                        Text(t.auth.signUp.alreadyHaveAnAccount).muted,
                         Gap(4),
                         Button.link(
                           onPressed: () => context.go(routePaths.auth.login),
                           style: ButtonStyle.link(
                             density: ButtonDensity.compact,
                           ),
-                          child: Text("Login"),
+                          child: Text(t.auth.login.login),
                         ),
                       ],
                     ),
