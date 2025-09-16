@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart' show Durations;
+import 'package:flutter/material.dart' show Durations, SelectionArea;
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
@@ -27,13 +27,19 @@ class ChatPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final response = useValueNotifier<WebSocketResponse?>(null);
-    final messageStream = useStreamController();
-    final socket = useValueNotifier<WebSocket?>(null);
-    final auth = ref.watch(authProvider);
-
     final scrollController = useScrollController();
 
+    final response = useValueNotifier<WebSocketResponse?>(null);
+    final promptController = useTextEditingController();
+    void cleanUp() {
+      promptController.text = '';
+      response.value = response.value?.copyWith(
+        message: response.value?.message?.copyWith(text: ''),
+      );
+    }
+
+    final messageStream = useStreamController();
+    final socket = useValueNotifier<WebSocket?>(null);
     final chat = useValueNotifier<Chat?>(
       chatId == null
           ? null
@@ -44,10 +50,9 @@ class ChatPage extends HookConsumerWidget {
             ),
     );
 
-    final messages = ref.watch(chatMessagesProvider(chat.value?.id));
-    final messagesNotifier = ref.watch(
-      chatMessagesProvider(chat.value?.id).notifier,
-    );
+    final auth = ref.watch(authProvider);
+    final messages = ref.watch(chatMessagesProvider(chatId));
+    final messagesNotifier = ref.watch(chatMessagesProvider(chatId).notifier);
 
     useEffect(() {
       if (!auth.hasValue) {
@@ -75,9 +80,7 @@ class ChatPage extends HookConsumerWidget {
 
         if (response.value?.status == StatusEnum.finished) {
           messagesNotifier.append(response.value!.message!);
-          response.value = response.value?.copyWith(
-            message: response.value?.message?.copyWith(text: ''),
-          );
+          cleanUp();
         }
 
         if (!scrollController.position.isScrollingNotifier.value) {
@@ -115,212 +118,268 @@ class ChatPage extends HookConsumerWidget {
           ],
           child: ValueListenableBuilder(
             valueListenable: response,
-            builder: (context, value, child) => CustomScrollView(
-              controller: scrollController,
-              slivers:
-                  [
-                        SliverToBoxAdapter(child: Gap(24)),
-                        if ((messages.value ?? []).isNotEmpty)
-                          SliverList.separated(
-                            itemCount: messages.value!.length,
-                            separatorBuilder: (context, index) => Gap(8),
-                            itemBuilder: (context, index) {
-                              final message = messages.value![index];
+            builder: (context, value, child) => (messages.value ?? []).isEmpty
+                ? _buildEmpty()
+                : CustomScrollView(
+                    controller: scrollController,
+                    slivers:
+                        [
+                              SliverGap(48),
+                              if ((messages.value ?? []).isNotEmpty)
+                                SliverList.separated(
+                                  itemCount: messages.value!.length,
+                                  separatorBuilder: (context, index) => Gap(8),
+                                  itemBuilder: (context, index) {
+                                    final message = messages.value![index];
 
-                              if (message.role == RoleEnum.user) {
-                                return Padding(
-                                  padding: EdgeInsets.only(top: 40),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Card(
-                                        filled: true,
-                                        fillColor: Colors.neutral.shade700,
-                                        borderColor: Colors.neutral.shade500,
-                                        child: Text(message.text),
-                                      ),
-                                      Gap(4),
-                                      IconButton.text(
-                                        onPressed: () {
-                                          Clipboard.setData(
-                                            ClipboardData(text: message.text),
-                                          );
-                                          showToast(
-                                            context: context,
-                                            location: ToastLocation.topCenter,
-                                            showDuration:
-                                                Durations.extralong4 * 2,
-                                            builder: (context, overlay) {
-                                              return SurfaceCard(
-                                                child: Basic(
-                                                  title: Text(
-                                                    t.chat.messageIsCopied,
+                                    if (message.role == RoleEnum.user) {
+                                      return Padding(
+                                        padding: EdgeInsets.only(top: 40),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Card(
+                                              filled: true,
+                                              fillColor:
+                                                  Colors.neutral.shade700,
+                                              borderColor:
+                                                  Colors.neutral.shade500,
+                                              child: Text(message.text),
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal: 16,
+                                              ),
+                                            ),
+                                            Gap(4),
+                                            IconButton.text(
+                                              onPressed: () {
+                                                Clipboard.setData(
+                                                  ClipboardData(
+                                                    text: message.text,
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                        icon: Icon(LucideIcons.copy, size: 16),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
+                                                );
+                                                showToast(
+                                                  context: context,
+                                                  location:
+                                                      ToastLocation.topCenter,
+                                                  showDuration:
+                                                      Durations.extralong4 * 2,
+                                                  builder: (context, overlay) {
+                                                    return SurfaceCard(
+                                                      child: Basic(
+                                                        title: Text(
+                                                          t
+                                                              .chat
+                                                              .messageIsCopied,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              icon: Icon(
+                                                LucideIcons.copy,
+                                                size: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
 
-                              return GptMarkdown(
-                                key: ValueKey(value),
-                                textDirection: TextDirection.rtl,
-                                message.text,
-                              );
-                            },
-                          ),
-                        if (value != null) ...[
-                          SliverGap(8),
-                          SliverToBoxAdapter(
-                            child: AnimatedCrossFade(
-                              crossFadeState:
-                                  value.status == StatusEnum.processing &&
-                                      value.message?.text == null
-                                  ? CrossFadeState.showFirst
-                                  : CrossFadeState.showSecond,
-                              duration: kDuration,
-                              firstChild: Align(
-                                alignment: Alignment.topRight,
-                                child: MLoading(),
-                              ),
-                              secondChild: AnimatedSwitcher(
-                                duration: kDuration,
-                                switchInCurve: kCurve,
-                                reverseDuration: Durations.short4 * 6,
-                                layoutBuilder:
-                                    (currentChild, previousChildren) => Stack(
-                                      alignment: Alignment.topLeft,
-                                      children: <Widget>[
-                                        ...previousChildren,
-                                        if (currentChild != null) currentChild,
-                                      ],
-                                    ),
-                                child: GptMarkdown(
-                                  key: ValueKey(value),
-                                  textDirection: TextDirection.rtl,
-                                  value.message?.text ?? '',
+                                    return SelectionArea(
+                                      child: GptMarkdown(
+                                        key: ValueKey(value),
+                                        textDirection: TextDirection.rtl,
+                                        message.text,
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (value == null)
-                          SliverFillRemaining(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(LucideIcons.lightbulb),
-                                Gap(8),
-                                Text("data"),
-                                Text("data"),
+
+                              // Incoming response
+                              ...[
+                                SliverGap(8),
+                                SliverToBoxAdapter(
+                                  child: _IncomingResponse(response: value),
+                                ),
                               ],
-                            ),
-                          ),
-                        SliverToBoxAdapter(child: Gap(180)),
-                      ]
-                      .map(
-                        (e) => SliverPadding(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          sliver: e,
-                        ),
-                      )
-                      .toList(),
-            ),
+                              SliverGap(180),
+                            ]
+                            .map(
+                              (e) => SliverPadding(
+                                padding: EdgeInsets.symmetric(horizontal: 24),
+                                sliver: e,
+                              ),
+                            )
+                            .toList(),
+                  ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Card(
-            child: Form(
-              onSubmit: (context, values) async {
-                response.value = null;
-                final text = values[_textKey];
+        _BottomPromptBox(
+          socket: socket.value,
+          promptController: promptController,
+          messagesNotifier: messagesNotifier,
+          cleanUp: cleanUp,
+          chatId: chatId,
+        ),
+      ],
+    );
+  }
 
-                messagesNotifier.append(
-                  Message(
-                    id: UuidV4().generate(),
-                    created: DateTime.now(),
-                    modified: DateTime.now(),
-                    role: RoleEnum.user,
-                    text: text,
-                  ),
-                );
+  Column _buildEmpty() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(LucideIcons.lightbulb, size: 30),
+        Gap(8),
+        Text(t.chat.emptyIntro, textAlign: TextAlign.center),
+      ],
+    );
+  }
+}
 
-                socket.value?.send(
-                  WebSocketRequestRequest(
-                    message: text,
-                    chatId: chat.value?.id,
-                  ).toJsonString(),
-                );
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+class _IncomingResponse extends StatelessWidget {
+  const _IncomingResponse({this.response});
+
+  final WebSocketResponse? response;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedCrossFade(
+      crossFadeState:
+          response?.status == StatusEnum.processing &&
+              response?.message?.text == null
+          ? CrossFadeState.showFirst
+          : CrossFadeState.showSecond,
+      duration: kDuration,
+      firstChild: Align(alignment: Alignment.topRight, child: MLoading()),
+      secondChild: AnimatedSwitcher(
+        duration: kDuration,
+        switchInCurve: kCurve,
+        reverseDuration: Durations.short4 * 6,
+        layoutBuilder: (currentChild, previousChildren) => Stack(
+          alignment: Alignment.topLeft,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        ),
+        child: GptMarkdown(
+          key: ValueKey(response),
+          textDirection: TextDirection.rtl,
+          response?.message?.text ?? '',
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomPromptBox extends StatelessWidget {
+  const _BottomPromptBox({
+    required this.socket,
+    required this.promptController,
+    required this.cleanUp,
+    required this.messagesNotifier,
+    this.chatId,
+  });
+
+  final String? chatId;
+  final WebSocket? socket;
+  final TextEditingController promptController;
+  final ChatMessagesNotifier messagesNotifier;
+  final VoidCallback cleanUp;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(
+        10.0,
+      ).copyWith(bottom: MediaQuery.viewInsetsOf(context).bottom + 10),
+      child: Card(
+        child: Form(
+          onSubmit: (context, values) async {
+            cleanUp();
+            final text = values[_textKey];
+
+            messagesNotifier.append(
+              Message(
+                id: UuidV4().generate(),
+                created: DateTime.now(),
+                modified: DateTime.now(),
+                role: RoleEnum.user,
+                text: text,
+              ),
+            );
+
+            socket?.send(
+              WebSocketRequestRequest(
+                message: text,
+                chatId: chatId,
+              ).toJsonString(),
+            );
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FormField(
+                key: _textKey,
+                label: SizedBox(),
+                validator: NotEmptyValidator(),
+                showErrors: {},
+                child: TextField(
+                  controller: promptController,
+                  filled: false,
+                  decoration: BoxDecoration(color: Colors.transparent),
+                  border: Border.all(color: Colors.transparent),
+                  padding: EdgeInsets.all(2),
+                  minLines: 1,
+                  maxLines: null,
+                  placeholder: Text(t.chat.writeAScenarioAbout),
+                ),
+              ),
+              Gap(8),
+              Row(
                 children: [
-                  FormField(
-                    key: _textKey,
-                    label: SizedBox(),
-                    validator: NotEmptyValidator(),
-                    showErrors: {},
-                    child: TextField(
-                      filled: false,
-                      decoration: BoxDecoration(color: Colors.transparent),
-                      border: Border.all(color: Colors.transparent),
-                      padding: EdgeInsets.all(2),
-                      minLines: 1,
-                      maxLines: null,
-                      placeholder: Text(t.chat.writeAScenarioAbout),
+                  Toggle(
+                    value: true,
+                    enabled: true,
+                    style: ButtonStyle.card(),
+                    child: Row(
+                      children: [
+                        Icon(BootstrapIcons.calendar3, size: 16),
+                        Gap(8),
+                        Text(t.chat.contentCalendar),
+                      ],
                     ),
                   ),
-                  Gap(8),
-                  Row(
-                    children: [
-                      Toggle(
-                        value: true,
-                        enabled: true,
-                        style: ButtonStyle.card(),
-                        child: Row(
-                          children: [
-                            Icon(BootstrapIcons.calendar3, size: 16),
-                            Gap(8),
-                            Text(t.chat.contentCalendar),
-                          ],
+                  Spacer(),
+                  FormErrorBuilder(
+                    builder: (context, errors, child) {
+                      return IconButton.primary(
+                        onPressed: errors.isNotEmpty
+                            ? null
+                            : () {
+                                context.submitForm();
+                              },
+                        icon: Icon(
+                          BootstrapIcons.arrowUpShort,
+                          size: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      Spacer(),
-                      FormErrorBuilder(
-                        builder: (context, errors, child) {
-                          return IconButton.primary(
-                            onPressed: errors.isNotEmpty
-                                ? null
-                                : () {
-                                    context.submitForm();
-                                  },
-                            icon: Icon(
-                              BootstrapIcons.arrowUpShort,
-                              size: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            shape: ButtonShape.circle,
-                            density: ButtonDensity.iconDense,
-                          );
-                        },
-                      ),
-                    ],
+                        shape: ButtonShape.circle,
+                        density: ButtonDensity.iconDense,
+                      );
+                    },
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

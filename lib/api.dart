@@ -10,7 +10,7 @@ import 'package:veezo/routes.dart';
 final apiProvider = Provider(Api.new);
 
 class Api extends RestClient {
-  Api(this.ref) : super(dioInstance(ref), baseUrl: baseUrl);
+  Api(this.ref) : super(dio = dioInstance(ref), baseUrl: baseUrl);
 
   final Ref ref;
 
@@ -25,7 +25,7 @@ class Api extends RestClient {
 
   String _token = '';
 
-  Dio get dio => dioInstance(ref);
+  static late Dio dio;
 
   String get token => _token;
   set token(String token) {

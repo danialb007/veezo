@@ -82,14 +82,17 @@ class TranslationsChatFa {
 	/// fa: 'چت جدید'
 	String get newChat => 'چت جدید';
 
-	/// fa: 'Message is copied'
-	String get messageIsCopied => 'Message is copied';
+	/// fa: 'پیام کپی شد'
+	String get messageIsCopied => 'پیام کپی شد';
 
 	/// fa: 'یه سناریو بنویس راجب ...'
 	String get writeAScenarioAbout => 'یه سناریو بنویس راجب ...';
 
 	/// fa: 'تقویم محتوایی'
 	String get contentCalendar => 'تقویم محتوایی';
+
+	/// fa: 'موضوع کاریت رو برامون بنویس و در چند ثانیه یه سناریو ریلز تحویل بگیر'
+	String get emptyIntro => 'موضوع کاریت رو برامون بنویس و در\nچند ثانیه یه سناریو ریلز تحویل\nبگیر';
 }
 
 // Path: auth.login
@@ -165,9 +168,10 @@ extension on Translations {
 			case 'auth.signUp.alreadyHaveAnAccount': return 'اکانت دارید؟';
 			case 'chat.credit': return 'اعتبار';
 			case 'chat.newChat': return 'چت جدید';
-			case 'chat.messageIsCopied': return 'Message is copied';
+			case 'chat.messageIsCopied': return 'پیام کپی شد';
 			case 'chat.writeAScenarioAbout': return 'یه سناریو بنویس راجب ...';
 			case 'chat.contentCalendar': return 'تقویم محتوایی';
+			case 'chat.emptyIntro': return 'موضوع کاریت رو برامون بنویس و در\nچند ثانیه یه سناریو ریلز تحویل\nبگیر';
 			default: return null;
 		}
 	}

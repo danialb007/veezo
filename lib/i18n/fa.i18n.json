@@ -23,8 +23,9 @@
 	"chat": {
 		"credit": "اعتبار",
 		"newChat": "چت جدید",
-		"messageIsCopied": "Message is copied",
+		"messageIsCopied": "پیام کپی شد",
 		"writeAScenarioAbout": "یه سناریو بنویس راجب ...",
-		"contentCalendar": "تقویم محتوایی"
+		"contentCalendar": "تقویم محتوایی",
+		"emptyIntro": "موضوع کاریت رو برامون بنویس و در\nچند ثانیه یه سناریو ریلز تحویل\nبگیر"
 	}
 }
