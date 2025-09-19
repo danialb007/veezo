@@ -23,12 +23,9 @@ class AuthNotifier extends AsyncNotifier<Login?> {
     state = AsyncLoading();
 
     try {
-      final response = await ref
-          .read(apiProvider)
-          .auth
-          .authLoginCreate(body: body);
+      final response = await Api.I.auth.authLoginCreate(body: body);
 
-      ref.read(apiProvider).token = response.access;
+      Api.I.token = response.access;
       final pref = await ref.read(sharedPrefProvider);
       await pref.setString(StorageKeys.auth.name, response.toJsonString());
 
@@ -41,7 +38,7 @@ class AuthNotifier extends AsyncNotifier<Login?> {
   Future<void> signup(SignupRequest body) async {
     state = AsyncLoading();
     try {
-      await ref.read(apiProvider).auth.authSignupCreate(body: body);
+      await Api.I.auth.authSignupCreate(body: body);
       state = AsyncData(null);
     } on DioException catch (e) {
       state = AsyncError(

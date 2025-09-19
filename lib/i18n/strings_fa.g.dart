@@ -51,6 +51,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 
 	late final TranslationsAuthFa auth = TranslationsAuthFa._(_root);
 	late final TranslationsChatFa chat = TranslationsChatFa._(_root);
+	late final TranslationsCreditsPlansFa creditsPlans = TranslationsCreditsPlansFa._(_root);
 }
 
 // Path: auth
@@ -82,6 +83,9 @@ class TranslationsChatFa {
 	/// fa: 'چت جدید'
 	String get newChat => 'چت جدید';
 
+	/// fa: 'پیام‌های گذشته'
+	String get previousChats => 'پیام‌های گذشته';
+
 	/// fa: 'پیام کپی شد'
 	String get messageIsCopied => 'پیام کپی شد';
 
@@ -93,6 +97,27 @@ class TranslationsChatFa {
 
 	/// fa: 'موضوع کاریت رو برامون بنویس و در چند ثانیه یه سناریو ریلز تحویل بگیر'
 	String get emptyIntro => 'موضوع کاریت رو برامون بنویس و در\nچند ثانیه یه سناریو ریلز تحویل\nبگیر';
+}
+
+// Path: creditsPlans
+class TranslationsCreditsPlansFa {
+	TranslationsCreditsPlansFa._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// fa: 'اعتبار'
+	String get credits => 'اعتبار';
+
+	/// fa: 'پلن ها'
+	String get plans => 'پلن ها';
+
+	/// fa: 'اعتبار و پلن‌ها'
+	String get creditsAndPlans => 'اعتبار و پلن‌ها';
+
+	/// fa: 'خرید'
+	String get purchase => 'خرید';
 }
 
 // Path: auth.login
@@ -168,10 +193,15 @@ extension on Translations {
 			case 'auth.signUp.alreadyHaveAnAccount': return 'اکانت دارید؟';
 			case 'chat.credit': return 'اعتبار';
 			case 'chat.newChat': return 'چت جدید';
+			case 'chat.previousChats': return 'پیام‌های گذشته';
 			case 'chat.messageIsCopied': return 'پیام کپی شد';
 			case 'chat.writeAScenarioAbout': return 'یه سناریو بنویس راجب ...';
 			case 'chat.contentCalendar': return 'تقویم محتوایی';
 			case 'chat.emptyIntro': return 'موضوع کاریت رو برامون بنویس و در\nچند ثانیه یه سناریو ریلز تحویل\nبگیر';
+			case 'creditsPlans.credits': return 'اعتبار';
+			case 'creditsPlans.plans': return 'پلن ها';
+			case 'creditsPlans.creditsAndPlans': return 'اعتبار و پلن‌ها';
+			case 'creditsPlans.purchase': return 'خرید';
 			default: return null;
 		}
 	}

@@ -4,7 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:veezo/api.dart';
 import 'package:veezo/generated/models/message.dart';
 
-class ChatMessagesNotifier extends FamilyAsyncNotifier<List<Message>, String?> {
+class ChatMessagesNotifier
+    extends AutoDisposeFamilyAsyncNotifier<List<Message>, String?> {
   @override
   FutureOr<List<Message>> build(String? chatId) async {
     if (chatId == null) {
@@ -16,10 +17,7 @@ class ChatMessagesNotifier extends FamilyAsyncNotifier<List<Message>, String?> {
 
   Future<List<Message>> getMessages(String chatId) async {
     try {
-      final messages = await ref
-          .read(apiProvider)
-          .ai
-          .aiMessageList(chatId: chatId);
+      final messages = await Api.I.ai.aiMessageList(chatId: chatId);
       return messages;
     } catch (e) {
       return [];
@@ -31,7 +29,7 @@ class ChatMessagesNotifier extends FamilyAsyncNotifier<List<Message>, String?> {
   }
 }
 
-final chatMessagesProvider =
-    AsyncNotifierProvider.family<ChatMessagesNotifier, List<Message>, String?>(
+final chatMessagesProvider = AsyncNotifierProvider.family
+    .autoDispose<ChatMessagesNotifier, List<Message>, String?>(
       ChatMessagesNotifier.new,
     );

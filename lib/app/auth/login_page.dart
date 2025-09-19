@@ -191,12 +191,9 @@ class _GoogleSigninButton extends HookConsumerWidget {
 
     if (idToken != null) {
       // Send the Google Access Token to your Django backend
-      final response = ref
-          .read(apiProvider)
-          .auth
-          .authGoogleLoginCreate(
-            body: SocialLoginRequest(accessToken: idToken),
-          );
+      final response = Api.I.auth.authGoogleLoginCreate(
+        body: SocialLoginRequest(accessToken: idToken),
+      );
 
       // if (response.statusCode == 200) {
       //   final Map<String, dynamic> data = jsonDecode(response.body);

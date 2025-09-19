@@ -5,6 +5,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/chat.dart';
 import '../models/message.dart';
 import '../models/web_socket_request_request.dart';
 import '../models/web_socket_response.dart';
@@ -15,6 +16,9 @@ part 'ai_client.g.dart';
 abstract class AiClient {
   factory AiClient(Dio dio, {String? baseUrl}) = _AiClient;
 
+  @GET('/api/v1/ai/chat/')
+  Future<List<Chat>> aiChatList();
+
   /// Dummy view to provide type to client generation
   @POST('/api/v1/ai/generative_message/')
   Future<WebSocketResponse> aiGenerativeMessageCreate({
@@ -23,6 +27,6 @@ abstract class AiClient {
 
   @GET('/api/v1/ai/message/')
   Future<List<Message>> aiMessageList({
-    @Path('chat_id') required String chatId,
+    @Query('chat_id') String? chatId,
   });
 }

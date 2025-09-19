@@ -14,6 +14,7 @@ class PatchedUserRequest with PatchedUserRequestMappable {
     this.image,
     this.firstName,
     this.lastName,
+    this.credits,
   });
   final String? username;
   final String? image;
@@ -21,6 +22,7 @@ class PatchedUserRequest with PatchedUserRequestMappable {
   final String? firstName;
   @MappableField(key: 'last_name')
   final String? lastName;
+  final int? credits;
 
 
   static PatchedUserRequest fromJson(Map<String, dynamic> json) => PatchedUserRequestMapper.ensureInitialized().decodeMap<PatchedUserRequest>(json);

@@ -10,9 +10,15 @@ import 'package:veezo/routes.dart';
 final apiProvider = Provider(Api.new);
 
 class Api extends RestClient {
-  Api(this.ref) : super(dio = dioInstance(ref), baseUrl: baseUrl);
-
   final Ref ref;
+
+  static late Api I;
+
+  factory Api(Ref ref) {
+    return I = Api._internal(ref);
+  }
+
+  Api._internal(this.ref) : super(dio = dioInstance(ref), baseUrl: baseUrl);
 
   static Dio dioInstance(Ref ref) =>
       Dio(BaseOptions(baseUrl: baseUrl, contentType: 'application/json'))
@@ -51,7 +57,7 @@ class Api extends RestClient {
               !options.path.contains("token_refresh")) {
             final auth = ref.read(authProvider).value;
             final authNotifier = ref.read(authProvider.notifier);
-            final api = ref.read(apiProvider);
+            final api = Api.I;
 
             if ((auth?.refresh ?? '').isEmpty ||
                 JwtDecoder.isExpired(auth?.refresh ?? '')) {

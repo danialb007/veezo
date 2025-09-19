@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'ai/ai_client.dart';
 import 'auth/auth_client.dart';
 import 'blog/blog_client.dart';
+import 'payment/payment_client.dart';
 
 /// Your Project API `v1.0.0 (v1)`.
 ///
@@ -26,10 +27,13 @@ class RestClient {
   AiClient? _ai;
   AuthClient? _auth;
   BlogClient? _blog;
+  PaymentClient? _payment;
 
   AiClient get ai => _ai ??= AiClient(_dio, baseUrl: _baseUrl);
 
   AuthClient get auth => _auth ??= AuthClient(_dio, baseUrl: _baseUrl);
 
   BlogClient get blog => _blog ??= BlogClient(_dio, baseUrl: _baseUrl);
+
+  PaymentClient get payment => _payment ??= PaymentClient(_dio, baseUrl: _baseUrl);
 }

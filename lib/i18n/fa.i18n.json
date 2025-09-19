@@ -23,9 +23,16 @@
 	"chat": {
 		"credit": "اعتبار",
 		"newChat": "چت جدید",
+		"previousChats": "پیام‌های گذشته",
 		"messageIsCopied": "پیام کپی شد",
 		"writeAScenarioAbout": "یه سناریو بنویس راجب ...",
 		"contentCalendar": "تقویم محتوایی",
 		"emptyIntro": "موضوع کاریت رو برامون بنویس و در\nچند ثانیه یه سناریو ریلز تحویل\nبگیر"
+	},
+	"creditsPlans": {
+		"credits": "اعتبار",
+		"plans": "پلن ها",
+		"creditsAndPlans": "اعتبار و پلن‌ها",
+		"purchase": "خرید"
 	}
 }

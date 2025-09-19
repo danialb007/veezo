@@ -47,6 +47,12 @@ class UserRequestMapper extends ClassMapperBase<UserRequest> {
     key: r'last_name',
     opt: true,
   );
+  static int? _$credits(UserRequest v) => v.credits;
+  static const Field<UserRequest, int> _f$credits = Field(
+    'credits',
+    _$credits,
+    opt: true,
+  );
 
   @override
   final MappableFields<UserRequest> fields = const {
@@ -54,6 +60,7 @@ class UserRequestMapper extends ClassMapperBase<UserRequest> {
     #image: _f$image,
     #firstName: _f$firstName,
     #lastName: _f$lastName,
+    #credits: _f$credits,
   };
 
   static UserRequest _instantiate(DecodingData data) {
@@ -62,6 +69,7 @@ class UserRequestMapper extends ClassMapperBase<UserRequest> {
       image: data.dec(_f$image),
       firstName: data.dec(_f$firstName),
       lastName: data.dec(_f$lastName),
+      credits: data.dec(_f$credits),
     );
   }
 
@@ -130,6 +138,7 @@ abstract class UserRequestCopyWith<$R, $In extends UserRequest, $Out>
     String? image,
     String? firstName,
     String? lastName,
+    int? credits,
   });
   UserRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -148,12 +157,14 @@ class _UserRequestCopyWithImpl<$R, $Out>
     Object? image = $none,
     Object? firstName = $none,
     Object? lastName = $none,
+    Object? credits = $none,
   }) => $apply(
     FieldCopyWithData({
       if (username != $none) #username: username,
       if (image != $none) #image: image,
       if (firstName != $none) #firstName: firstName,
       if (lastName != $none) #lastName: lastName,
+      if (credits != $none) #credits: credits,
     }),
   );
   @override
@@ -162,6 +173,7 @@ class _UserRequestCopyWithImpl<$R, $Out>
     image: data.get(#image, or: $value.image),
     firstName: data.get(#firstName, or: $value.firstName),
     lastName: data.get(#lastName, or: $value.lastName),
+    credits: data.get(#credits, or: $value.credits),
   );
 
   @override

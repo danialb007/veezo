@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:veezo/api.dart';
 import 'package:veezo/domain/di.dart';
 import 'package:veezo/i18n/strings.g.dart';
 import 'package:veezo/routes.dart';
@@ -17,7 +18,11 @@ void main() async {
   configureDependencies();
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
-  runApp(TranslationProvider(child: ProviderScope(child: const VeezoApp())));
+  runApp(
+    TranslationProvider(
+      child: ProviderScope(child: _DIContainer(child: const VeezoApp())),
+    ),
+  );
 }
 
 class VeezoApp extends StatelessWidget {
@@ -46,5 +51,17 @@ class VeezoApp extends StatelessWidget {
 
       routerConfig: router,
     );
+  }
+}
+
+class _DIContainer extends ConsumerWidget {
+  final Widget child;
+
+  const _DIContainer({required this.child});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(apiProvider);
+    return child;
   }
 }

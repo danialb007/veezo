@@ -14,6 +14,7 @@ class UserRequest with UserRequestMappable {
     this.image,
     this.firstName,
     this.lastName,
+    this.credits,
   });
   final String? username;
   final String? image;
@@ -21,6 +22,7 @@ class UserRequest with UserRequestMappable {
   final String? firstName;
   @MappableField(key: 'last_name')
   final String? lastName;
+  final int? credits;
 
 
   static UserRequest fromJson(Map<String, dynamic> json) => UserRequestMapper.ensureInitialized().decodeMap<UserRequest>(json);

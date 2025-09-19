@@ -6,6 +6,34 @@
         "description": "Your project description"
     },
     "paths": {
+        "/api/v1/ai/chat/": {
+            "get": {
+                "operationId": "ai_chat_list",
+                "tags": [
+                    "ai"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Chat"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/v1/ai/generative_message/": {
             "post": {
                 "operationId": "ai_generative_message_create",
@@ -48,13 +76,12 @@
                 "operationId": "ai_message_list",
                 "parameters": [
                     {
-                        "in": "path",
+                        "in": "query",
                         "name": "chat_id",
                         "schema": {
                             "type": "string",
                             "format": "uuid"
-                        },
-                        "required": true
+                        }
                     }
                 ],
                 "tags": [
@@ -407,6 +434,34 @@
                     }
                 }
             }
+        },
+        "/api/v1/payment/plan/": {
+            "get": {
+                "operationId": "payment_plan_list",
+                "tags": [
+                    "payment"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Plan"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -619,8 +674,48 @@
                     "last_name": {
                         "type": "string",
                         "maxLength": 150
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
                     }
                 }
+            },
+            "Plan": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "price": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "maximum": 32767,
+                        "minimum": 0
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "description",
+                    "id",
+                    "title"
+                ]
             },
             "RoleEnum": {
                 "enum": [
@@ -771,6 +866,11 @@
                         "format": "email",
                         "readOnly": true,
                         "title": "Email address"
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
                     }
                 },
                 "required": [
@@ -799,6 +899,11 @@
                     "last_name": {
                         "type": "string",
                         "maxLength": 150
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
                     }
                 }
             },
@@ -857,8 +962,7 @@
                         "type": [
                             "string",
                             "null"
-                        ],
-                        "minLength": 1
+                        ]
                     }
                 },
                 "required": [

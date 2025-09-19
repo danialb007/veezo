@@ -1,16 +1,20 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart' show Durations, SelectionArea;
+import 'package:flutter/material.dart'
+    show Durations, RefreshIndicator, SelectionArea;
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:shadcn_flutter/shadcn_flutter_extension.dart';
 import 'package:uuid/v4.dart';
 import 'package:veezo/api.dart';
 import 'package:veezo/domain/auth/auth_notifier.dart';
 import 'package:veezo/domain/chat/chat_messages_notifier.dart';
+import 'package:veezo/domain/chat/chat_provider.dart';
 import 'package:veezo/generated/export.dart';
 import 'package:veezo/i18n/strings.g.dart';
 import 'package:veezo/presentation/widgets/loading.dart';
@@ -38,21 +42,20 @@ class ChatPage extends HookConsumerWidget {
       );
     }
 
-    final messageStream = useStreamController();
     final socket = useValueNotifier<WebSocket?>(null);
     final chat = useValueNotifier<Chat?>(
       chatId == null
           ? null
-          : Chat(
-              id: chatId ?? '',
-              created: DateTime.now(),
-              modified: DateTime.now(),
+          : (ref.read(chatProvider).value ?? []).firstWhere(
+              (element) => element.id == chatId!,
             ),
     );
 
     final auth = ref.watch(authProvider);
-    final messages = ref.watch(chatMessagesProvider(chatId));
-    final messagesNotifier = ref.watch(chatMessagesProvider(chatId).notifier);
+
+    final chatMessageProvider = useValueNotifier(chatMessagesProvider(chatId));
+    final messages = ref.watch(chatMessageProvider.value);
+    final messagesNotifier = ref.watch(chatMessageProvider.value.notifier);
 
     useEffect(() {
       if (!auth.hasValue) {
@@ -73,10 +76,9 @@ class ChatPage extends HookConsumerWidget {
         ),
       );
 
-      messageStream.addStream(socket.value!.messages);
-      messageStream.stream.listen((event) {
+      final listener = socket.value!.messages.listen((event) {
         response.value = WebSocketResponse.fromJson(json.decode(event));
-        chat.value = response.value?.chat;
+        chat.value ??= response.value?.chat;
 
         if (response.value?.status == StatusEnum.finished) {
           messagesNotifier.append(response.value!.message!);
@@ -88,7 +90,7 @@ class ChatPage extends HookConsumerWidget {
         }
       });
       return () {
-        messageStream.close();
+        listener.cancel();
         socket.value!.close();
       };
     }, [auth]);
@@ -99,18 +101,40 @@ class ChatPage extends HookConsumerWidget {
         Scaffold(
           headers: [
             HookBuilder(
-              builder: (context) {
+              builder: (_) {
                 useListenable(chat);
                 return AppBar(
                   title: Text(chat.value?.title ?? t.chat.newChat),
                   leading: [
                     IconButton.ghost(
-                      onPressed: () {},
+                      onPressed: () {
+                        openDrawer(
+                          context: context,
+                          showDragHandle: false,
+                          transformBackdrop: false,
+                          barrierColor: Colors.black.scaleAlpha(0.5),
+                          builder: (context) {
+                            return ChatsHistory(chatId: chatId);
+                          },
+                          position: OverlayPosition.start,
+                        );
+                      },
                       icon: Icon(LucideIcons.menu),
                     ),
+                    if (GoRouterState.of(context).fullPath !=
+                        routePaths.chat.path)
+                      IconButton.ghost(
+                        onPressed: () => context.go(routePaths.chat.path),
+                        icon: Icon(LucideIcons.messageCircle),
+                      ),
                   ],
                   trailing: [
-                    Button.text(onPressed: () {}, child: Text(t.chat.credit)),
+                    Button.text(
+                      onPressed: () {
+                        context.go(routePaths.creditsAndPlans);
+                      },
+                      child: Text(t.chat.credit),
+                    ),
                   ],
                 );
               },
@@ -119,12 +143,12 @@ class ChatPage extends HookConsumerWidget {
           child: ValueListenableBuilder(
             valueListenable: response,
             builder: (context, value, child) => (messages.value ?? []).isEmpty
-                ? _buildEmpty()
+                ? _buildEmpty(context)
                 : CustomScrollView(
                     controller: scrollController,
                     slivers:
                         [
-                              SliverGap(48),
+                              SliverGap(24),
                               if ((messages.value ?? []).isNotEmpty)
                                 SliverList.separated(
                                   itemCount: messages.value!.length,
@@ -134,7 +158,9 @@ class ChatPage extends HookConsumerWidget {
 
                                     if (message.role == RoleEnum.user) {
                                       return Padding(
-                                        padding: EdgeInsets.only(top: 40),
+                                        padding: EdgeInsets.only(
+                                          top: index == 0 ? 0 : 40,
+                                        ),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -168,6 +194,9 @@ class ChatPage extends HookConsumerWidget {
                                                   builder: (context, overlay) {
                                                     return SurfaceCard(
                                                       child: Basic(
+                                                        titleAlignment:
+                                                            AlignmentDirectional
+                                                                .centerStart,
                                                         title: Text(
                                                           t
                                                               .chat
@@ -228,13 +257,17 @@ class ChatPage extends HookConsumerWidget {
     );
   }
 
-  Column _buildEmpty() {
+  Column _buildEmpty(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(LucideIcons.lightbulb, size: 30),
+        Icon(
+          LucideIcons.lightbulb,
+          size: 30,
+          color: context.theme.colorScheme.mutedForeground,
+        ),
         Gap(8),
-        Text(t.chat.emptyIntro, textAlign: TextAlign.center),
+        Text(t.chat.emptyIntro, textAlign: TextAlign.center).muted,
       ],
     );
   }
@@ -378,6 +411,70 @@ class _BottomPromptBox extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChatsHistory extends HookConsumerWidget {
+  const ChatsHistory({super.key, required this.chatId});
+
+  final String? chatId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final chats = ref.watch(chatProvider);
+    final route = GoRouterState.of(context);
+
+    useEffect(() {
+      Future.delayed(Durations.short2, () => ref.invalidate(chatProvider));
+      return null;
+    }, []);
+
+    return Container(
+      padding: EdgeInsets.all(8),
+      width: (MediaQuery.sizeOf(context).width * 0.8).clamp(0, 400),
+      alignment: Alignment.center,
+      child: RefreshIndicator(
+        onRefresh: () => ref.refresh(chatProvider.future),
+        child: chats.when(
+          error: (error, stackTrace) {
+            return Text("err");
+          },
+          loading: () {
+            return CircularProgressIndicator();
+          },
+          data: (data) {
+            return ListView.separated(
+              itemCount: data.length + 1,
+              separatorBuilder: (_, __) => Gap(8),
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return NavigationLabel(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(t.chat.previousChats).muted,
+                  );
+                }
+                final item = data[index - 1];
+                return Button.ghost(
+                  child: Text(item.title ?? 'بدون تیتر'),
+                  alignment: AlignmentDirectional.centerStart,
+                  onPressed: () {
+                    if (chatId != item.id) {
+                      while (context.canPop() &&
+                          route.fullPath != routePaths.chat.path) {
+                        context.pop();
+                      }
+                      context.go(routePaths.chat.detail(item.id));
+                    }
+
+                    closeDrawer(context);
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
     );

@@ -16,6 +16,7 @@ class User with UserMappable {
     this.image,
     this.firstName,
     this.lastName,
+    this.credits,
   });
   final int id;
   final String email;
@@ -25,6 +26,7 @@ class User with UserMappable {
   final String? firstName;
   @MappableField(key: 'last_name')
   final String? lastName;
+  final int? credits;
 
 
   static User fromJson(Map<String, dynamic> json) => UserMapper.ensureInitialized().decodeMap<User>(json);
